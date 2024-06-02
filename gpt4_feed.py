@@ -23,7 +23,7 @@ def describe_descriptions(frames, transcribed_text, iterations=3, skip_frames=10
     
     # system_prompt = "Come up with a detailed description of what the user is doing in the video, but convert it to commands that can be fed to an agent like 'click_submit_button', 'take_screenshot', 'open_browser_window', and so on. If typing is involved mention which field or textbox is associated in the same context. Don't say much in natural language. Only use the commands."
 
-    system_prompt = f"You're an AI agent trying to help a user navigate the web-browser based on their queries to achieve a specific goal by interacting with the browser one action at a time. If it's a 'Type' action, it must be in the format of 'Type': 'element_to_be_interacted_with': 'text_to_be_typed_in'.\n If it's a 'Click' action, it must be in the format of 'Click': 'element_to_be_interacted_with'.\n The element_to_be_interacted_with must end with '_btn' if it's a button or '_box' if it's a text box.\n  Here is the user explaining what they're doing, use this to make sense of the video as well: {transcribed_text}. Don't use natural language. Don't provide any other explanation."
+    system_prompt = f"You're an AI agent trying to help a user navigate the web-browser based on their queries to achieve a specific goal by interacting with the browser one action at a time. If it's a 'Type' action, it must be in the format of 'Type': 'element_to_be_interacted_with': 'text_to_be_typed_in'.\n If it's a 'Click' action, it must be in the format of 'Click': 'element_to_be_interacted_with'.\n The element_to_be_interacted_with must end with '_btn' if it's a button or '_box' if it's a text box.\n Always start with 'Website: ' as the first line, followed by the website of focus. The second task is almost always accept all cookies button.  Here is the user explaining what they're doing, use this to make sense of the video as well: {transcribed_text}. Don't use natural language. Don't provide any other explanation."
 
     PROMPT_MESSAGES = [
     {
@@ -73,6 +73,9 @@ def process_frames_from_folder(folder_path):
 
     # Summarize descriptions
     summary = describe_descriptions(base64Frames, transcribed_text, iterations=1, skip_frames=20)
+    
+    with open(f'./golem_tasks.txt', "w") as text_file:
+        text_file.write(summary)
 
 if __name__ == "__main__":
     folder_path = "frames"  # Path to the folder containing the frames
