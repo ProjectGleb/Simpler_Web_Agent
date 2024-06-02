@@ -17,13 +17,13 @@ if 'openai_api_key' in api_keys:
 else:
     exit('Please enter API key')
 
-def describe_descriptions(frames, iterations=3, skip_frames=10):
+def describe_descriptions(frames, transcribed_text, iterations=3, skip_frames=10):
 
     # system_prompt = "Come up with a detailed description of what the user is doing in the video, but convert it to commands that can be fed to an agent like 'click_submit_button', 'take_screenshot', 'open_browser_window', and so on. If typing is involved mention which field or textbox associated. Don't say much in natural language. Only use the commands. format it as a dictionary like so: 'Click0': 'accept_all_btn', 'Type0': {'google_search_box': 'github.com'}, 'Click1': 'google_search_btn', 'Click2': 'github_lets_build_from_here_link', 'Click3': 'github_sign_in_btn', 'Type2': {'github_signin_username_box': username}, 'Type3': {'github_signin_password_box': password}, 'Click4': 'sign_in_btn', 'Type4': {'new_repo_name_box': 'Automated QL Repo Test'}, 'Click5': 'public_btn', 'Click6': 'create_new_repository_btn'"
     
     # system_prompt = "Come up with a detailed description of what the user is doing in the video, but convert it to commands that can be fed to an agent like 'click_submit_button', 'take_screenshot', 'open_browser_window', and so on. If typing is involved mention which field or textbox is associated in the same context. Don't say much in natural language. Only use the commands."
 
-    system_prompt = "You're an AI agent trying to help a user navigate the web-browser based on their queries to achieve a specific goal by interacting with the browser one action at a time. If it's a 'Type' action, it must be in the format of 'Type': 'element_to_be_interacted_with': 'text_to_be_typed_in'.\n If it's a 'Click' action, it must be in the format of 'Click1': 'element_to_be_interacted_with'.\n The element_to_be_interacted_with must end with '_btn' if it's a button or '_box' if it's a text box.\n Each action should have an index embedded into it based on the index of the past action. So if the past action was 'Click1', the next action should be 'Click2'.\n"
+    system_prompt = f"You're an AI agent trying to help a user navigate the web-browser based on their queries to achieve a specific goal by interacting with the browser one action at a time. If it's a 'Type' action, it must be in the format of 'Type': 'element_to_be_interacted_with': 'text_to_be_typed_in'.\n If it's a 'Click' action, it must be in the format of 'Click': 'element_to_be_interacted_with'.\n The element_to_be_interacted_with must end with '_btn' if it's a button or '_box' if it's a text box.\n  Here is the user explaining what they're doing, use this to make sense of the video as well: {transcribed_text}. Don't use natural language. Don't provide any other explanation."
 
     PROMPT_MESSAGES = [
     {
@@ -35,7 +35,6 @@ def describe_descriptions(frames, iterations=3, skip_frames=10):
         },
     ]
     
-
     last_response = None 
 
     for _ in range(iterations):     
@@ -67,8 +66,13 @@ def process_frames_from_folder(folder_path):
         _, buffer = cv2.imencode(".png", img_frame)
         base64Frames.append(base64.b64encode(buffer).decode("utf-8"))
 
+    with open(f'{folder_path}/transcription.txt', "r") as text_file:
+        transcribed_text = text_file.read()
+    
+    print('transcribed text : ', transcribed_text)
+
     # Summarize descriptions
-    summary = describe_descriptions(base64Frames, iterations=1, skip_frames=20)
+    summary = describe_descriptions(base64Frames, transcribed_text, iterations=1, skip_frames=20)
 
 if __name__ == "__main__":
     folder_path = "frames"  # Path to the folder containing the frames
