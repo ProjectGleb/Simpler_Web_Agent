@@ -1,6 +1,6 @@
 # Browserbot: an attempt at automating digital tasks 
 
-An AI-enabled bot that performs tedious, repetitive digital tasks, from referring to a human walkthrough video. Made for the [SOTA Hack](https://twitter.com/sotalikesfuture/status/1789045594301858095). 
+An AI-enabled bot that performs tedious, repetitive digital tasks, by referring to a human walkthrough video. Made for the [SOTA Hack](https://twitter.com/sotalikesfuture/status/1789045594301858095). 
 
 Demo video: https://www.youtube.com/watch?v=7KqTQCBoYMg
 
